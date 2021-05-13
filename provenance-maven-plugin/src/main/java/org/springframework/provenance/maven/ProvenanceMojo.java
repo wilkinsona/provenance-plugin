@@ -18,11 +18,7 @@ package org.springframework.provenance.maven;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Paths;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -31,12 +27,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
-import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.springframework.provenance.Provenance;
-import org.springframework.provenance.github.UrlParser;
-import org.springframework.provenance.model.Project;
-import org.springframework.provenance.model.Repository.Content;
 
 /**
  * @author Michael Minella
@@ -58,7 +49,7 @@ public class ProvenanceMojo extends AbstractMojo {
 
 		if(this.mavenProject.isExecutionRoot()) {
 			try {
-				new Provenance(new File(this.mavenProject.getBasedir(), ".git"), this.projectName, this.mavenProject.getVersion(), (message) -> getLog().info(message))
+				new Provenance(this.projectName, this.mavenProject.getVersion(), (message) -> getLog().info(message))
 						.write(new File(this.mavenProject.getBuild().getDirectory()));
 			}
 			catch (IOException e) {

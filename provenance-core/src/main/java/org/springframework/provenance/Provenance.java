@@ -19,7 +19,10 @@ package org.springframework.provenance;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
@@ -32,29 +35,35 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 
 public class Provenance {
 	
-	private final File gitDir;
-	
 	private final String name;
 	
 	private final String version;
 	
 	private final Logger logger;
 	
-	public Provenance(File gitDir, String name, String version, Logger logger) {
-		this.gitDir = gitDir;
+	public Provenance(String name, String version, Logger logger) {
 		this.name = name;
 		this.version = version;
 		this.logger = logger;
 	}
 	
 	public void write(File outputDir) throws IOException {
-		logger.info("Git directory: " + this.gitDir.getAbsolutePath());
-		Repository currentRepo = new FileRepositoryBuilder()
-				.setGitDir(this.gitDir)
-				.build();
-		
-		String remoteUrl = currentRepo.getConfig()
-				.getString("remote", "origin", "url");
+		Path output = Files.createTempFile("origin-url", ".tmp");
+		Process process = new ProcessBuilder("git", "remote", "get-url", "origin").redirectOutput(output.toFile()).start();
+		try {
+			int result = process.waitFor();
+			if (result != 0) {
+				throw new RuntimeException("git failed with exit value " + process.exitValue());
+			}
+		} catch (InterruptedException ex) {
+			Thread.currentThread().interrupt();
+			throw new RuntimeException("Interrupted while waiting for git process");
+		}
+		List<String> lines = Files.readAllLines(output);
+		if (lines.size() != 1) {
+			throw new RuntimeException("Unexpected output from git");
+		}	
+		String remoteUrl = lines.get(0);
 
 		logger.info("Git Origin URL: " + remoteUrl);
 		logger.info("Output directory: " + outputDir);
