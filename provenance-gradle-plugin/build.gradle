@@ -1,0 +1,28 @@
+plugins {
+	id 'java-gradle-plugin'
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation gradleApi()
+	implementation fileTree(dir: 'target/dependencies/compile', include: '*.jar')
+}
+
+java {
+	withSourcesJar()
+	withJavadocJar()
+}
+
+gradlePlugin {
+	plugins {
+		provenancePlugin {
+			id = "org.springframework.provenance"
+			displayName = "Provenance Gradle Plugin"
+			description = "Provenance Gradle Plugin"
+			implementationClass = "org.springframework.provenance.gradle.ProvenancePlugin"
+		}
+	}
+}

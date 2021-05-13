@@ -19,6 +19,7 @@ target/
 test-output
 result.txt
 .flattened-pom.xml
+provenance-gradle-plugin/.gradle/
 
 # Eclipse artifacts, including WTP generated manifests
 .classpath

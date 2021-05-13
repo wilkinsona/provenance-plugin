@@ -58,7 +58,7 @@ public class ProvenanceMojo extends AbstractMojo {
 
 		if(this.mavenProject.isExecutionRoot()) {
 			try {
-				new Provenance(this.mavenProject.getBasedir(), this.projectName, this.mavenProject.getVersion(), (message) -> getLog().info(message))
+				new Provenance(new File(this.mavenProject.getBasedir(), ".git"), this.projectName, this.mavenProject.getVersion(), (message) -> getLog().info(message))
 						.write(new File(this.mavenProject.getBuild().getDirectory()));
 			}
 			catch (IOException e) {

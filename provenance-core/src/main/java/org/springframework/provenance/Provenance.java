@@ -32,7 +32,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 
 public class Provenance {
 	
-	private final File root;
+	private final File gitDir;
 	
 	private final String name;
 	
@@ -40,18 +40,19 @@ public class Provenance {
 	
 	private final Logger logger;
 	
-	public Provenance(File root, String name, String version, Logger logger) {
-		this.root = root;
+	public Provenance(File gitDir, String name, String version, Logger logger) {
+		this.gitDir = gitDir;
 		this.name = name;
 		this.version = version;
 		this.logger = logger;
 	}
 	
 	public void write(File outputDir) throws IOException {
+		logger.info("Git directory: " + this.gitDir.getAbsolutePath());
 		Repository currentRepo = new FileRepositoryBuilder()
-				.setGitDir(new File(root, ".git"))
+				.setGitDir(this.gitDir)
 				.build();
-
+		
 		String remoteUrl = currentRepo.getConfig()
 				.getString("remote", "origin", "url");
 
