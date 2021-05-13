@@ -13,7 +13,7 @@
     <dependency>
       <groupId>org.springframework.provenance</groupId>
       <artifactId>provenance-core</artifactId>
-      <version>${revision}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
