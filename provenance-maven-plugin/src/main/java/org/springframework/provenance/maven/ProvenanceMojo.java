@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.provenance;
+package org.springframework.provenance.maven;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +33,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-
+import org.springframework.provenance.Provenance;
 import org.springframework.provenance.github.UrlParser;
 import org.springframework.provenance.model.Project;
 import org.springframework.provenance.model.Repository.Content;
@@ -58,41 +58,11 @@ public class ProvenanceMojo extends AbstractMojo {
 
 		if(this.mavenProject.isExecutionRoot()) {
 			try {
-				Repository currentRepo = new FileRepositoryBuilder()
-						.setGitDir(new File("./.git"))
-						.build();
-
-				String remoteUrl = currentRepo.getConfig()
-						.getString("remote", "origin", "url");
-
-				getLog().info("Git Origin URL: " + remoteUrl);
-				getLog().info("Output directory: " + this.mavenProject.getBuild().getDirectory());
-
-				URL url = UrlParser.parse(remoteUrl);
-
-				Project project = new Project(this.projectName,
-						this.mavenProject.getVersion());
-
-				org.springframework.provenance.model.Repository repository =
-						new org.springframework.provenance.model.Repository(Content.SOURCE,
-								url.getHost(),
-								"Git",
-								url.getPath());
-
-				project.addSourceRepository(repository);
-
-				ObjectMapper mapper = new ObjectMapper();
-				mapper.setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
-
-				mapper.writerWithDefaultPrettyPrinter()
-						.writeValue(
-						Paths.get(
-								this.mavenProject.getBuild()
-										.getDirectory() + "/provenance.json").toFile(),
-						project);
+				new Provenance(this.mavenProject.getBasedir(), this.projectName, this.mavenProject.getVersion(), (message) -> getLog().info(message))
+						.write(new File(this.mavenProject.getBuild().getDirectory()));
 			}
 			catch (IOException e) {
-				throw new MojoFailureException("Unable to open git repository for this project", e);
+				throw new MojoFailureException("Failed to write provenance information for this project", e);
 			}
 		}
 	}
