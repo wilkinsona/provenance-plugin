@@ -24,7 +24,7 @@
 				</phases>
 				<default-phases>
 					<package>
-						org.springframework:provenance-plugin:${project.version}:provenance
+						org.springframework.provenance:provenance-maven-plugin:${revision}:provenance
 					</package>
 				</default-phases>
 			</configuration>
